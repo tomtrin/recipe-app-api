@@ -17,18 +17,13 @@ def detail_url(recipe_id, recipe_ingredient_id):
         args=[recipe_id, recipe_ingredient_id])
 
 
-def create_recipe_ingredient(recipe, ingredient, **params):
-    defaults = {
-        'recipe': recipe,
-        'ingredient': ingredient,
-        'units': RecipeIngredient.CUP,
-        'quantity': 1
-    }
-    defaults.update(params)
+def create_recipe_ingredient(
+        recipe, ingredient, units=RecipeIngredient.CUP, quantity=1):
     return RecipeIngredient.objects.create(
         recipe=recipe,
         ingredient=ingredient,
-        **defaults,
+        units=units,
+        quantity=quantity,
     )
 
 
