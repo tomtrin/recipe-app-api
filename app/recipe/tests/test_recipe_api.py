@@ -7,6 +7,8 @@ from rest_framework import status
 from core.models import (
     Recipe,
     Tag,
+    Ingredient,
+    RecipeIngredient,
 )
 
 RECIPES_URL = reverse('recipe:recipe-list')
@@ -225,7 +227,6 @@ class AuthenticatedRecipeAPITests(TestCase):
 
         recipes = Recipe.objects.filter(user=self.user)
         self.assertEqual(recipes.count(), 1)
-
         recipe = recipes[0]
         self.assertEqual(recipe.tags.count(), 2)
         for tag in payload['tags']:
@@ -312,3 +313,21 @@ class AuthenticatedRecipeAPITests(TestCase):
         res = self.client.patch(url, payload, format='json')
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(recipe.tags.all().count(), 0)
+
+    def test_get_recipe_with_ingredient(self):
+        recipe = create_recipe(user=self.user)
+        ingredient = Ingredient.objects.create(user=self.user, name='chickpeas')
+        recipe.recipe_ingredients.add(RecipeIngredient.objects.create(
+            recipe=recipe,
+            ingredient=ingredient,
+            units=RecipeIngredient.CUP,
+            quantity=2
+        ))
+        recipe.save()
+
+        url = detail_url(recipe_id=recipe.id)
+        res = self.client.get(url)
+        recipe_ingredients_data = res.data['recipe_ingredients'][0]
+        self.assertEqual(
+            recipe_ingredients_data['ingredient']['name'],
+            ingredient.name)

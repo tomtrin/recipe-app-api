@@ -72,3 +72,64 @@ class Tag(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Ingredient(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+
+class RecipeIngredient(models.Model):
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name='recipe_ingredients'
+    )
+
+    ingredient = models.ForeignKey(
+        Ingredient,
+        on_delete=models.CASCADE
+    )
+
+    NONE = ''
+    TEASPOON = 'tsp'
+    TABLESPOON = 'tbsp'
+    CUP = 'cup'
+    OUNCE = 'oz'
+    MILLITERS = 'ml'
+    LITER = 'l'
+    MILGRAM = 'mg'
+    GRAM = 'gm'
+    KILOGRAM = 'kg'
+
+    UNITS_OF_MEASUREMENT = (
+        (NONE, 'None'),
+        (TEASPOON, 'Teaspoon'),
+        (TABLESPOON, 'Tablespoon'),
+        (CUP, 'Cup'),
+        (OUNCE, 'Ounce'),
+        (MILLITERS, 'Milliter'),
+        (LITER, 'Litre'),
+        (MILGRAM, 'Milgram'),
+        (GRAM, 'Gram'),
+        (KILOGRAM, 'Kilogram'),
+    )
+
+    quantity = models.IntegerField()
+    units = models.CharField(
+        max_length=10,
+        choices=UNITS_OF_MEASUREMENT,
+        default=NONE,
+    )
+
+    def __str__(self):
+        if self.units == self.NONE:
+            return f"{self.quantity} {self.ingredient}"
+
+        return f"{self.quantity} {self.units} {self.ingredient}"
