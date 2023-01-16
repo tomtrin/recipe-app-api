@@ -21,14 +21,15 @@ class RecipeIngredientModelTest(TestCase):
             user=user,
             name='Chickpeas',
         )
-        recipeIngredient = RecipeIngredient.objects.create(
+        RecipeIngredient.objects.create(
             recipe=recipe,
             ingredient=ingredient,
             units=RecipeIngredient.CUP,
             quantity=2,
         )
 
-        ingredient_amounts_from_db = RecipeIngredient.objects.filter(recipe=recipe)
+        ingredient_amounts_from_db = RecipeIngredient.objects.filter(
+            recipe=recipe)
 
         self.assertEqual(ingredient_amounts_from_db.count(), 1)
         self.assertEqual(ingredient_amounts_from_db[0].ingredient, ingredient)

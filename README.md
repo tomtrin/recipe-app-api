@@ -41,10 +41,10 @@ You must be authenticated in order to use the recipe endpoints.
 1. Create an authentication token using the `/api/user/token` endpoint
 2. Copy the returned token string
 3. Click the 'Authorize' button at the top of the page
-4. Under 'TokenAuth' field enter `token {TOKEN_VALUE}` where TOKEN_VALUE is the value you copied in step #2
+4. Under 'TokenAuth' section, enter into the value field `token TOKEN_VALUE` where TOKEN_VALUE is the value you copied in step #2
 5. You should now be able to access all the protected endpoints
 
 ### Manage resources through admin portal
 `http://localhost:8000/admin`
 
-(You will need to register a user)
+(You will need to register a user to log in)

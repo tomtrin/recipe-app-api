@@ -2,8 +2,10 @@ from django.test import TestCase
 from core.tests.helper import create_user
 from core import models
 
+
 def create_tag(user, name):
     return models.Tag.objects.create(user=user, name=name)
+
 
 class RecipeModelTests(TestCase):
 

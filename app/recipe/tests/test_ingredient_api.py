@@ -1,5 +1,4 @@
 from django.test import TestCase
-from django.contrib.auth import get_user_model
 from django.urls import reverse
 
 from rest_framework.test import APIClient
@@ -34,21 +33,21 @@ class UnauthenticatedIngredientAPITests(TestCase):
         user = create_user()
         ingredient = create_ingredient(user, 'ingredient1')
         url = detail_url(ingredient.id)
-        res = self.client.patch(url, {'name':'ingredient2'})
+        res = self.client.patch(url, {'name': 'ingredient2'})
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_full_update_fails(self):
         user = create_user()
         ingredient = create_ingredient(user, 'ingredient1')
         url = detail_url(ingredient.id)
-        res = self.client.put(url, {'name':'ingredient2'})
+        res = self.client.put(url, {'name': 'ingredient2'})
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_delete_fails(self):
         user = create_user()
         ingredient = create_ingredient(user, 'ingredient1')
         url = detail_url(ingredient.id)
-        res = self.client.delete(url, {'name':'ingredient2'})
+        res = self.client.delete(url, {'name': 'ingredient2'})
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
@@ -74,7 +73,7 @@ class AuthenticatedIngredientAPITests(TestCase):
         ingredient1 = create_ingredient(self.user, 'Ingredient1')
 
         other_user = create_user(email='other@example.com')
-        ingredient3 = create_ingredient(other_user, 'Ingredient2')
+        create_ingredient(other_user, 'Ingredient2')
 
         res = self.client.get(INGREDIENT_URL)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
@@ -173,7 +172,7 @@ class AuthenticatedIngredientAPITests(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
-        for k,v in res.data.items():
+        for k, v in res.data.items():
             self.assertEqual(getattr(ingredient, k), v)
 
     def test_get_ingredient_for_other_user_fails(self):

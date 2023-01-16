@@ -19,6 +19,7 @@ from core.models import (
     RecipeIngredient,
 )
 
+
 class RecipeViewSet(viewsets.ModelViewSet):
     """ View for managing recipe APIs"""
     serializer_class = RecipeDetailSerializer
@@ -94,7 +95,8 @@ class RecipeIngredientViewSet(
     authentication_classes = [TokenAuthentication]
 
     def get_queryset(self):
-        return self.queryset.filter(recipe__user=self.request.user).order_by('ingredient')
+        return self.queryset.filter(
+            recipe__user=self.request.user).order_by('ingredient')
 
     def perform_create(self, serializer):
         serializer.save()

@@ -53,7 +53,7 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         ingredient = validated_data.pop('ingredient', [])
-        ingredient.update({ 'name': ingredient['name'].lower()})
+        ingredient.update({'name': ingredient['name'].lower()})
 
         ingredient_obj = self._get_or_create_ingredient(ingredient)
         recipe_ingredient = RecipeIngredient.objects.create(

@@ -1,5 +1,4 @@
 from django.test import TestCase
-from django.contrib.auth import get_user_model
 from django.urls import reverse
 
 from rest_framework.test import APIClient
@@ -13,15 +12,23 @@ def recipe_ingredient_url(recipe_id):
 
 
 def detail_url(recipe_id, recipe_ingredient_id):
-    return reverse('recipe:recipe-ingredient-detail', args=[recipe_id, recipe_ingredient_id])
+    return reverse(
+        'recipe:recipe-ingredient-detail',
+        args=[recipe_id, recipe_ingredient_id])
 
 
-def create_recipe_ingredient(recipe, ingredient, units=RecipeIngredient.CUP, quantity=1):
+def create_recipe_ingredient(recipe, ingredient, **params):
+    defaults = {
+        'recipe': recipe,
+        'ingredient': ingredient,
+        'units': RecipeIngredient.CUP,
+        'quantity': 1
+    }
+    defaults.update(params)
     return RecipeIngredient.objects.create(
         recipe=recipe,
         ingredient=ingredient,
-        units=units,
-        quantity=quantity,
+        **defaults,
     )
 
 
@@ -148,7 +155,7 @@ class AuthenticatedRecipeIngredientAPITests(TestCase):
         res = self.client.post(url, payload, format='json')
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
 
-    def test_create_recipe_ingredient_does_not_create_duplicate_ingredient(self):
+    def test_create_recipe_ingredient_does_not_duplicate_ingredient(self):
         recipe = create_recipe(self.user)
         ingredient = create_ingredient(self.user, name='chickpeas')
 
@@ -168,7 +175,6 @@ class AuthenticatedRecipeIngredientAPITests(TestCase):
 
         ingredients_from_db = Ingredient.objects.all()
         self.assertEqual(ingredients_from_db.count(), 1)
-
 
     def test_create_recipe_ingredient_ignores_ingredient_casing(self):
         recipe = create_recipe(self.user)
@@ -223,7 +229,8 @@ class AuthenticatedRecipeIngredientAPITests(TestCase):
         res = self.client.patch(url, payload, format='json')
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         recipe_ingredient.refresh_from_db()
-        self.assertEqual(recipe_ingredient.ingredient.name, payload['ingredient']['name'])
+        self.assertEqual(recipe_ingredient.ingredient.name,
+                         payload['ingredient']['name'])
 
         all_ingredients = Ingredient.objects.all()
         self.assertEqual(all_ingredients.count(), 2)
@@ -232,7 +239,10 @@ class AuthenticatedRecipeIngredientAPITests(TestCase):
         recipe = create_recipe(self.user)
         ingredient = create_ingredient(self.user, 'Apples')
         recipe_ingredient = create_recipe_ingredient(
-            recipe=recipe, ingredient=ingredient, units=RecipeIngredient.GRAM, quantity='10')
+            recipe=recipe,
+            ingredient=ingredient,
+            units=RecipeIngredient.GRAM,
+            quantity='10')
 
         payload = {
             'recipe': recipe.id,
@@ -247,7 +257,8 @@ class AuthenticatedRecipeIngredientAPITests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
         recipe_ingredient.refresh_from_db()
-        self.assertEqual(recipe_ingredient.ingredient.name, payload['ingredient']['name'])
+        self.assertEqual(recipe_ingredient.ingredient.name,
+                         payload['ingredient']['name'])
         self.assertEqual(recipe_ingredient.units, payload['units'])
         self.assertEqual(recipe_ingredient.quantity, payload['quantity'])
 

@@ -30,6 +30,7 @@ def create_recipe(user, **params):
     recipe = Recipe.objects.create(user=user, **defaults)
     return recipe
 
+
 def create_user(**params):
     return get_user_model().objects.create_user(**params)
 
@@ -170,10 +171,10 @@ class AuthenticatedRecipeAPITests(TestCase):
             rating=5,
         )
         payload = {
-            'title':'New Title',
-            'description':'New Description',
-            'link':'http://example.com/new-recipe-link',
-            'rating':4,
+            'title': 'New Title',
+            'description': 'New Description',
+            'link': 'http://example.com/new-recipe-link',
+            'rating': 4,
         }
 
         res = self.client.put(detail_url(recipe_id=recipe.id), data=payload)
@@ -210,7 +211,7 @@ class AuthenticatedRecipeAPITests(TestCase):
         )
         recipe = create_recipe(user=other_user)
         url = detail_url(recipe_id=recipe.id)
-        res = self.client.patch(url, {'title':'Another Title'})
+        res = self.client.patch(url, {'title': 'Another Title'})
 
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
 
@@ -218,7 +219,7 @@ class AuthenticatedRecipeAPITests(TestCase):
         payload = {
             'title': 'My Thai Recipe',
             'time_minutes': 30,
-            'tags':[{'name': 'thai'}, {'name': 'dinner'}]
+            'tags': [{'name': 'thai'}, {'name': 'dinner'}]
         }
 
         res = self.client.post(RECIPES_URL, payload, format='json')
@@ -242,7 +243,7 @@ class AuthenticatedRecipeAPITests(TestCase):
         payload = {
             'title': 'My Indian Recipe',
             'time_minutes': 30,
-            'tags':[{'name': 'indian'}, {'name': 'dinner'}]
+            'tags': [{'name': 'indian'}, {'name': 'dinner'}]
         }
 
         res = self.client.post(RECIPES_URL, payload, format='json')
@@ -268,7 +269,7 @@ class AuthenticatedRecipeAPITests(TestCase):
     def test_update_recipe_with_new_tags(self):
         recipe = create_recipe(user=self.user)
         payload = {
-            'tags':[{'name': 'thai'}]
+            'tags': [{'name': 'thai'}]
         }
 
         url = detail_url(recipe_id=recipe.id)
@@ -287,7 +288,7 @@ class AuthenticatedRecipeAPITests(TestCase):
 
         tag2 = Tag.objects.create(user=self.user, name='tag2')
         payload = {
-            'tags':[{'name': 'tag2'}]
+            'tags': [{'name': 'tag2'}]
         }
 
         url = detail_url(recipe_id=recipe.id)
@@ -306,7 +307,7 @@ class AuthenticatedRecipeAPITests(TestCase):
         recipe.tags.add(tag2)
 
         payload = {
-            'tags':[]
+            'tags': []
         }
 
         url = detail_url(recipe_id=recipe.id)
@@ -316,7 +317,8 @@ class AuthenticatedRecipeAPITests(TestCase):
 
     def test_get_recipe_with_ingredient(self):
         recipe = create_recipe(user=self.user)
-        ingredient = Ingredient.objects.create(user=self.user, name='chickpeas')
+        ingredient = Ingredient.objects.create(
+            user=self.user, name='chickpeas')
         recipe.recipe_ingredients.add(RecipeIngredient.objects.create(
             recipe=recipe,
             ingredient=ingredient,

@@ -1,5 +1,4 @@
 from django.test import TestCase
-from django.contrib.auth import get_user_model
 from django.urls import reverse
 
 from rest_framework.test import APIClient
@@ -34,21 +33,21 @@ class UnauthenticatedTagAPITests(TestCase):
         user = create_user()
         tag = create_tag(user, 'tag1')
         url = detail_url(tag.id)
-        res = self.client.patch(url, {'name':'tag2'})
+        res = self.client.patch(url, {'name': 'tag2'})
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_full_update_fails(self):
         user = create_user()
         tag = create_tag(user, 'tag1')
         url = detail_url(tag.id)
-        res = self.client.put(url, {'name':'tag2'})
+        res = self.client.put(url, {'name': 'tag2'})
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_delete_fails(self):
         user = create_user()
         tag = create_tag(user, 'tag1')
         url = detail_url(tag.id)
-        res = self.client.delete(url, {'name':'tag2'})
+        res = self.client.delete(url, {'name': 'tag2'})
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
@@ -74,7 +73,7 @@ class AuthenticatedTagAPITests(TestCase):
         tag1 = create_tag(self.user, 'Tag1')
 
         other_user = create_user(email='other@example.com')
-        tag3 = create_tag(other_user, 'Tag2')
+        create_tag(other_user, 'Tag2')
 
         res = self.client.get(TAG_URL)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
@@ -173,7 +172,7 @@ class AuthenticatedTagAPITests(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
-        for k,v in res.data.items():
+        for k, v in res.data.items():
             self.assertEqual(getattr(tag, k), v)
 
     def test_get_tag_for_other_user_fails(self):
