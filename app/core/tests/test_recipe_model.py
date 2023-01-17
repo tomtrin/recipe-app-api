@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from django.test import TestCase
 from core.tests.helper import create_user
 from core import models
@@ -41,3 +43,11 @@ class RecipeModelTests(TestCase):
 
         self.assertIn(tag1, recipe_tags)
         self.assertIn(tag2, recipe_tags)
+
+    @patch('core.models.uuid.uuid4')
+    def test_recipe_file_name_uuid(self, mock_uuid):
+        uuid = 'test-uuid'
+        mock_uuid.return_value = uuid
+        file_path = models.recipe_image_file_path(None, 'example.jpg')
+
+        self.assertEqual(file_path, f'uploads/recipe/{uuid}.jpg')
