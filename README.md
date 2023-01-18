@@ -24,6 +24,10 @@ The following steps are nice to haves for a local setup using vscode and will al
 ```
 % docker-compose run --rm app sh -c 'python manage.py test'
 ```
+### How to run linting
+```
+% docker-compose run --rm app sh -c 'flake8'
+```
 
 ### Running the API
 ```

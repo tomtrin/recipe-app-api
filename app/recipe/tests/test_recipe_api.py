@@ -343,6 +343,42 @@ class AuthenticatedRecipeAPITests(TestCase):
             recipe_ingredients_data['ingredient']['name'],
             ingredient.name)
 
+    def test_list_recipe_filtered_by_tag_id(self):
+        tag1 = Tag.objects.create(user=self.user, name='vegan')
+        tag2 = Tag.objects.create(user=self.user, name='vegetarian')
+        recipe1 = create_recipe(user=self.user, title='Vegan Recipe')
+        recipe2 = create_recipe(user=self.user, title='Vegetarian Recipe')
+        recipe1.tags.add(tag1)
+        recipe2.tags.add(tag2)
+        create_recipe(user=self.user)
+
+        params = {'tags': f'{tag1.id},{tag2.id}'}
+        res = self.client.get(RECIPES_URL, params)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(res.data), 2)
+
+    def test_list_recipe_filtered_by_ingredient_id(self):
+        i1 = Ingredient.objects.create(user=self.user, name='chickpeas')
+        i2 = Ingredient.objects.create(user=self.user, name='milk')
+        recipe1 = create_recipe(user=self.user, title='Vegan Recipe')
+        recipe2 = create_recipe(user=self.user, title='Vegetarian Recipe')
+        RecipeIngredient.objects.create(
+            recipe=recipe1, ingredient=i1,
+            units=RecipeIngredient.CUP, quantity=1)
+        RecipeIngredient.objects.create(
+            recipe=recipe2, ingredient=i2,
+            units=RecipeIngredient.CUP, quantity=1)
+
+        create_recipe(user=self.user, title='Sausage Recipe')
+
+        params = {'ingredients': f'{i1.id},{i2.id}'}
+        res = self.client.get(RECIPES_URL, params)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(res.data), 2)
+        # self.assertEqual(res.data[0]['recipe_ingredients'][0].values(), 2)
+
 
 class ImageUploadTests(TestCase):
 
@@ -368,6 +404,21 @@ class ImageUploadTests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertIn('image', res.data)
         self.assertTrue(os.path.exists(self.recipe.image.path))
+
+    def test_get_recipe_with_image(self):
+        url = image_upload_url(self.recipe.id)
+        with tempfile.NamedTemporaryFile(suffix='.jpg') as image_file:
+            img = Image.new('RGB', (10, 10))
+            img.save(image_file, format='JPEG')
+            image_file.seek(0)
+            payload = {'image': image_file}
+            res = self.client.post(url, payload, format='multipart')
+
+        recipe_url = detail_url(recipe_id=self.recipe.id)
+        res = self.client.get(recipe_url)
+
+        self.assertTrue(res.data['image'].startswith(
+            'http://testserver/static/media/uploads/recipe/'))
 
     def test_upload_image_bad_request(self):
         url = image_upload_url(self.recipe.id)

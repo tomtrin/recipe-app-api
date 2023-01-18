@@ -25,6 +25,11 @@ class IngredientSerializer(serializers.ModelSerializer):
 class RecipeIngredientSerializer(serializers.ModelSerializer):
     ingredient = IngredientSerializer(many=False)
 
+    class Meta:
+        model = RecipeIngredient
+        fields = ['id', 'recipe', 'ingredient', 'units', 'quantity']
+        read_only_fields = ['id']
+
     def _get_or_create_ingredient(self, ingredient):
         auth_user = self.context['request'].user
         ingredient_obj, created = Ingredient.objects.get_or_create(
@@ -46,11 +51,6 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
-    class Meta:
-        model = RecipeIngredient
-        fields = ['id', 'recipe', 'ingredient', 'units', 'quantity']
-        read_only_fields = ['id']
-
     def create(self, validated_data):
         ingredient = validated_data.pop('ingredient', [])
         ingredient.update({'name': ingredient['name'].lower()})
@@ -67,7 +67,8 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Recipe
-        fields = ['id', 'title', 'time_minutes', 'rating', 'link', 'tags']
+        fields = ['id', 'title', 'time_minutes',
+                  'rating', 'link', 'tags', 'image']
         read_only_fields = ['id']
 
 

@@ -3,7 +3,7 @@ from django.urls import reverse
 
 from rest_framework.test import APIClient
 from rest_framework import status
-from core.models import Tag
+from core.models import Tag, Recipe
 from core.tests.helper import create_user
 
 TAG_URL = reverse('recipe:tag-list')
@@ -182,3 +182,44 @@ class AuthenticatedTagAPITests(TestCase):
         url = detail_url(tag.id)
         res = self.client.get(url)
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_list_tags_assigned_to_recipes(self):
+        tag1 = create_tag(self.user, 'assigned_1')
+        recipe = Recipe.objects.create(
+            user=self.user, title='My Recipe', time_minutes=5)
+        recipe.tags.add(tag1)
+        create_tag(self.user, 'unassigned_2')
+
+        params = {'assignment_status': 'assigned'}
+        res = self.client.get(TAG_URL, params)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(res.data), 1)
+        self.assertEqual(res.data[0]['name'], 'assigned_1')
+
+    def test_list_tags_unassigned_to_recipes(self):
+        tag1 = create_tag(self.user, 'assigned_1')
+        recipe = Recipe.objects.create(
+            user=self.user, title='My Recipe', time_minutes=5)
+        recipe.tags.add(tag1)
+        create_tag(self.user, 'unassigned_2')
+
+        params = {'assignment_status': 'unassigned'}
+        res = self.client.get(TAG_URL, params)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(res.data), 1)
+        self.assertEqual(res.data[0]['name'], 'unassigned_2')
+
+    def test_list_tags_with_all_assignment_statuses(self):
+        tag1 = create_tag(self.user, 'assigned_1')
+        recipe = Recipe.objects.create(
+            user=self.user, title='My Recipe', time_minutes=5)
+        recipe.tags.add(tag1)
+        create_tag(self.user, 'unassigned_2')
+
+        params = {'assignment_status': 'all'}
+        res = self.client.get(TAG_URL, params)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(res.data), 2)
