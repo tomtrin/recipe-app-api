@@ -153,6 +153,14 @@ class IngredientViewSet(BaseRecipeAttrViewSet):
     queryset = Ingredient.objects.all()
 
 
+@extend_schema(
+    parameters=[OpenApiParameter(
+        'recipe_pk',
+        OpenApiTypes.STR,
+        OpenApiParameter.PATH,
+        description='A unique integer value identifying the associated recipe',
+        required=True)],
+)
 class RecipeIngredientViewSet(BaseRecipeAttrViewSet):
     serializer_class = RecipeIngredientSerializer
     queryset = RecipeIngredient.objects.all()

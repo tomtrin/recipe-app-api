@@ -29,7 +29,7 @@ The following steps are nice to haves for a local setup using vscode and will al
 % docker-compose run --rm app sh -c 'flake8'
 ```
 
-### Running the API
+### Running the API locally
 ```
 ## Start the server ##
 % docker-compose up
@@ -38,8 +38,27 @@ The following steps are nice to haves for a local setup using vscode and will al
 % docker-compose down
 ```
 
+### Running the API using deployment configuration
+Use the steps below to deploy the app as it would be configured when deployed to the server
+```
+## Copy the sample .env file
+## Modify the .env to your own custom values (Optional)
+% cp ./.env.sample ./.env
+```
+```
+
+## Build the required images
+% docker-compose -f docker-compose-deploy.yml build
+
+## Run DB, API, and NGINX
+% docker-compose -f docker-compose-deploy.yml up
+```
+
+Once running, open the browser to:
+`http://127.0.0.1/api/docs/`
+
 ### View API Docs (Swagger):
-`http://localhost:8000/api/docs/`
+`http://127.0.0.1:8000/api/docs/`
 
 You must be authenticated in order to use the recipe endpoints.
 1. Create an authentication token using the `/api/user/token` endpoint
