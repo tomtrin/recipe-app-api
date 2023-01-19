@@ -15,9 +15,12 @@ The following steps are nice to haves for a local setup using vscode and will al
 ## Create a virtual environment (venv)
 % python3.9 -m venv ./venv && /venv/bin/pip install --upgrade pip
 
-## Install pip dependencies on local virtual environment
-## (for )
+## Install pip dependencies on local virtual environment (optional)
 % ./update-venv.sh
+```
+Create a superuser in order to log into the django admin portal
+```
+% docker-compose run --rm app sh -c 'python manage.py createsuperuser'
 ```
 
 ### How to run tests
